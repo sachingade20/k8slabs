@@ -1,0 +1,46 @@
+---
+apiVersion: extensions/v1beta1
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+kind: Deployment
+metadata:
+  name: hello-world-deployment-v2
+  labels:
+    demo: replication-services
+# number of PHP pods (replicas) to run
+# increase this number if you need to scale PHP horizontally
+# since we have 3, the LoadBalancer will serve our app from all 3
+spec:
+  replicas: 2
+  # The number of old deployments you want to keep around
+  revisionHistoryLimit: 2
+  # make replicas of kubernetes objects with the label app: php-dbconnect
+  selector:
+    matchLabels:
+      app: hello-world-v2
+  # the pod template describes what type of pod to create
+  # when the defined number of replicas are not up
+  # in this case, the pod that will be created is the one labeled app: php-dbconnect
+  template:
+    metadata:
+      name: hello-world-pod-v2
+      labels:
+        app: hello-world-v2
+        demo: replication-services
+
+    spec:
+      containers:
+      - name: webapp
+        image: training/webapp
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-proxy-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+      volumes:
+      - name: nginx-proxy-config
+        configMap:
+          name: mc3-nginx-conf
+

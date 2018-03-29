@@ -1,0 +1,53 @@
+---
+apiVersion: extensions/v1beta1
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+kind: Deployment
+metadata:
+  name: hello-world-deployment-v3
+  labels:
+    demo: rollback-demo
+# number of PHP pods (replicas) to run
+# increase this number if you need to scale PHP horizontally
+# since we have 3, the LoadBalancer will serve our app from all 3
+spec:
+  replicas: 2
+  # The number of old deployments you want to keep around
+  revisionHistoryLimit: 2
+  # make replicas of kubernetes objects with the label app: php-dbconnect
+  selector:
+    matchLabels:
+      app: hello-world-v3
+  # the pod template describes what type of pod to create
+  # when the defined number of replicas are not up
+  # in this case, the pod that will be created is the one labeled app: php-dbconnect
+  template:
+    metadata:
+      name: hello-world-pod-v3
+      labels:
+        app: hello-world-v3
+        demo: rollback-demo
+
+    spec:
+      containers:
+      - name: webapp
+        image: training/webapp
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world-v3
+  labels:
+    demo: rollback-demo
+spec:
+  # comment or delete the following line if you want to use a LoadBalancer
+  type: NodePort
+  # if your cluster supports it, uncomment the following to automatically create
+  # an external load-balanced IP for the frontend service.
+  # type: LoadBalancer
+  ports:
+  - port: 5000
+  selector:
+    app: hello-world-v3
+

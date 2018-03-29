@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+kind: Pod
+metadata:
+  name: hello-world
+  labels:
+    app: hello-world
+spec:
+  containers:
+  - name: webapp
+    image: training/webapp:v2
+    ports:
+    - containerPort: 5000
+
