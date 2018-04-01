@@ -1,0 +1,17 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: test-pv-3
+  labels:
+    type: gce
+spec:
+  capacity:
+    storage: 50Gi
+# ReadWriteOnce – the volume can be mounted as read-write by a single node
+# ReadOnlyMany – the volume can be mounted read-only by many nodes
+# ReadWriteMany – the volume can be mounted as read-write by many nodes
+  accessModes:
+    - ReadWriteOnce
+  gcePersistentDisk:
+    fsType: "ext4"
+    pdName: "test-pv-3"

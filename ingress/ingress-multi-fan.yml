@@ -1,0 +1,35 @@
+#foo.bar.com -> 178.91.123.132 -> / php    web:80
+#                                 / frontend    frontend:80
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gb-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: helloweb-ip
+spec:
+  rules:
+  - host: *
+    http:
+      paths:
+      - path: /php
+        backend:
+          serviceName: web
+          servicePort: 80
+      - path: /gb
+        backend:
+          serviceName: frontend
+          servicePort: 80
+  rules:
+  - host: foo.bar.com
+    http:
+      paths:
+      - backend:
+          serviceName: web
+          servicePort: 80
+  - host: bar.foo.com
+    http:
+      paths:
+      - backend:
+          serviceName: frontend
+          servicePort: 80
+

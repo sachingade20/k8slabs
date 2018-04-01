@@ -1,0 +1,20 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+# ReadWriteOnce – the volume can be mounted as read-write by a single node
+# ReadOnlyMany – the volume can be mounted read-only by many nodes
+# ReadWriteMany – the volume can be mounted as read-write by many nodes
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+
+
+

@@ -3,33 +3,38 @@ apiVersion: extensions/v1beta1
 # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 kind: Deployment
 metadata:
-  name: hello-world-deployment-v3
-  labels:
-    demo: rollback-demo
+  name: task-pv-gce-deployment-v2
 # number of PHP pods (replicas) to run
 # increase this number if you need to scale PHP horizontally
 # since we have 3, the LoadBalancer will serve our app from all 3
 spec:
-  replicas: 2
+  replicas: 3
   # The number of old deployments you want to keep around
   revisionHistoryLimit: 2
   # make replicas of kubernetes objects with the label app: php-dbconnect
   selector:
-    matchLabels:
-      app: hello-world-v3
+     matchExpressions:
+      - {key: app, operator: In, values: [task-pv]}
+
   # the pod template describes what type of pod to create
   # when the defined number of replicas are not up
   # in this case, the pod that will be created is the one labeled app: php-dbconnect
   template:
     metadata:
-      name: hello-world-pod-v3
+      name: task-pv-gce
       labels:
-        app: hello-world-v3
-        demo: rollback-demo
-
+        app: task-pv
     spec:
+      volumes:
+        - name: task-pv-storage
+          persistentVolumeClaim:
+           claimName: test-pvc-3
       containers:
-      - name: webapp
-        image: training/webapp
-        ports:
-        - containerPort: 5000
+        - name: task-pv-container
+          image: nginx
+          ports:
+            - containerPort: 80
+              name: "http-server"
+          volumeMounts:
+            - mountPath: "/usr/share/nginx/html"
+              name: task-pv-storage

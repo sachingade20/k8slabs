@@ -15,8 +15,9 @@ spec:
   revisionHistoryLimit: 2
   # make replicas of kubernetes objects with the label app: php-dbconnect
   selector:
-    matchLabels:
-      app: hello-world-v2
+     matchExpressions:
+      - {key: app, operator: In, values: [hello-world-v2, hello-world-v3]}
+
   # the pod template describes what type of pod to create
   # when the defined number of replicas are not up
   # in this case, the pod that will be created is the one labeled app: php-dbconnect
@@ -26,11 +27,13 @@ spec:
       labels:
         app: hello-world-v2
         demo: replication-services
-
     spec:
       containers:
       - name: webapp
         image: training/webapp
+        volumeMounts:
+        - name: nginx-proxy-config
+          mountPath: /data/myconfig
       - name: nginx
         image: nginx:alpine
         ports:
